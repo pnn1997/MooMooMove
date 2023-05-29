@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NpcSpawner : MonoBehaviour
@@ -7,6 +5,7 @@ public class NpcSpawner : MonoBehaviour
     public GameObject cowmonnerPrefab;
     public uint numCowmonners = 3;
     public HerdManager cowmonners;
+    public KingCowController kingCow;
 
     private const uint MAX_COWS = 50;
 
@@ -15,8 +14,7 @@ public class NpcSpawner : MonoBehaviour
     {
         cowmonners.Initialize();
         numCowmonners = (uint) Mathf.Min(numCowmonners, MAX_COWS);
-
-        SpawnCowCircles(new Vector3(0, 0, 0), numCowmonners);
+        SpawnCowCircles(kingCow.transform.position, numCowmonners);
     }
 
     void SpawnCowCircle(Vector3 center, uint numCows, float circleRadius)

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UfoController : MonoBehaviour
@@ -14,7 +12,7 @@ public class UfoController : MonoBehaviour
     {
         IDLE,
         CHARGING,
-        FIRED
+        COOLDOWN
     }
     private WeaponState weaponState;
 
@@ -33,7 +31,7 @@ public class UfoController : MonoBehaviour
             case WeaponState.CHARGING:
                 ChargeWeapon();
                 break;
-            case WeaponState.FIRED:
+            case WeaponState.COOLDOWN:
                 WeaponCooldown();
                 break;
         }
@@ -86,7 +84,7 @@ public class UfoController : MonoBehaviour
 
         renderer.color = new(0, 0, 0);
         collider.enabled = true;
-        weaponState = WeaponState.FIRED;
+        weaponState = WeaponState.COOLDOWN;
     }
 
     private void WeaponCooldown()
@@ -98,15 +96,18 @@ public class UfoController : MonoBehaviour
             return;
         }
 
+        // Disable hitbox while cooldown is in effect
+        collider.enabled = false;
+
         var alphaVal = renderer.color.a;
-        if (alphaVal <= 0)
+        if (alphaVal <= 0f)
         {
             // Weapon has completely cooled down
             DisableWeapon();
         }
         else
         {
-            var chargeAmount = 1.0f / cooldownTime;
+            var chargeAmount = 0.75f / cooldownTime;
             var newAlpha = alphaVal - (chargeAmount * Time.deltaTime);
             renderer.color = new(0, 0, 0, newAlpha);
         }
@@ -114,7 +115,6 @@ public class UfoController : MonoBehaviour
 
     private void DisableWeapon()
     {
-        weaponState = WeaponState.IDLE;
         var collider = weapon.GetComponent<CircleCollider2D>();
         var renderer = weapon.GetComponent<SpriteRenderer>();
         if (!collider || !renderer)
@@ -124,6 +124,7 @@ public class UfoController : MonoBehaviour
 
         collider.enabled = false;
         renderer.enabled = false;
+        weaponState = WeaponState.IDLE;
     }
 
     private void MoveToHerdCenter()

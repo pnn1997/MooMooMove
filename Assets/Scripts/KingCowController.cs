@@ -14,11 +14,8 @@ public class KingCowController : CowController
     // Update is called once per frame
     void Update()
     {
-        if (IsAlive)
-        {
-            MoveCommand = ProcessKeyInput();
-            Move();
-        }
+        MoveCommand = ProcessKeyInput();
+        Move();
     }
 
     // Handles game over event

@@ -14,6 +14,11 @@ public class CameraFollower : MonoBehaviour
     public float smoothTime = 0.25f;
     Vector3 currentVelocity;
 
+    private void Start()
+    {
+        lastPosition = player.position;
+    }
+
     private void LateUpdate()
     {
         SetTarget();

@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.anyKey)
+        if (!isGameOver && Input.anyKey)
         {
             startGamePanel.SetActive(false);
             Time.timeScale = 1;
@@ -53,6 +53,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator GameOverSequence()
     {
         gameOverPanel.SetActive(true);
+        Time.timeScale = 0;
 
         yield return new WaitForSeconds(5.0f);
     }
