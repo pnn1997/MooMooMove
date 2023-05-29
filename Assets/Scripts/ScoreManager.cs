@@ -8,7 +8,7 @@ public class ScoreManager : MonoBehaviour
     public HerdManager herd;
     public InvasionManager invasion;
 
-    public TMP_Text scoreText, highScoreText;
+    public TMP_Text scoreText, highScoreText, cowCountText;
     private int score, highscore;
     private float elapsedTime;
     private const int MAX_SCORE = 999999;
@@ -23,6 +23,7 @@ public class ScoreManager : MonoBehaviour
     {
         scoreText.text = score.ToString("D6");
         highScoreText.text = highscore.ToString("D6");
+        cowCountText.text = herd.GetHerdSize().ToString("D2");
 
         // Scoring is added every second for each cow still alive in the herd
         if (elapsedTime > 1.0f)

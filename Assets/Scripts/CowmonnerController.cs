@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CowmonnerController : CowController
@@ -13,17 +14,21 @@ public class CowmonnerController : CowController
     public float alignmentStrength = 1;                 // How fast cows will try to move in the same direction as other cows
     public float alignmentCheckDistance = 1;            // How close cows are before checking where the other cows are headed
 
+    private const float ABDUCTION_DURATION = 1.0f;
+    private bool isAlive;
+
     // Start is called before the first frame update
     void Start()
     {
         Initialize();
+        isAlive = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Only move if in the current herd
-        if (transform.parent.GetComponent<HerdManager>())
+        // Only move if alive and in the current herd
+        if (isAlive && transform.parent.GetComponent<HerdManager>())
         {
             direction = Vector3.zero;
 
@@ -37,14 +42,27 @@ public class CowmonnerController : CowController
         }
     }
 
+    IEnumerator FadeAbductedCow(Color start, Color end, float duration)
+    {
+        for (float t = 0f; t < duration; t += Time.deltaTime)
+        {
+            float normalizedTime = t / duration;
+            GetComponent<SpriteRenderer>().color = Color.Lerp(start, end, normalizedTime);
+            yield return null;
+        }
+        GetComponent<SpriteRenderer>().color = end;
+        Destroy(gameObject);
+    }
+
     protected override void HandleCowAbduction()
     {
+        isAlive = false;
         var cowHerd = transform.parent.GetComponent<HerdManager>();
         if (cowHerd)
         {
             cowHerd.Remove(gameObject);
         }
-        Destroy(gameObject);
+        StartCoroutine(FadeAbductedCow(Color.white, new Color(1, 0, 0, 0), ABDUCTION_DURATION));
     }
 
     private void MoveToKing()
