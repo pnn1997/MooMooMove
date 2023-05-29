@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class UfoController : MonoBehaviour
 {
-    public GameObject targets;
-    public GameObject weapon;
+    public HerdManager targets;
+    public CircleCollider2D weaponCollider;
+    public SpriteRenderer weaponRenderer;
     public float moveSpeed = 12;
     public float chargeTime = 2;
     public float cooldownTime = 0.5f;
@@ -39,27 +40,14 @@ public class UfoController : MonoBehaviour
 
     private void InitializeWeapon()
     {
-        var renderer = weapon.GetComponent<SpriteRenderer>();
-        if (!renderer)
-        {
-            return;
-        }
-
-        renderer.color = new (255, 0, 0, 0);
-        renderer.enabled = true;
+        weaponRenderer.color = new (255, 0, 0, 0);
+        weaponRenderer.enabled = true;
         weaponState = WeaponState.CHARGING;
     }
 
     private void ChargeWeapon()
     {
-        var collider = weapon.GetComponent<CircleCollider2D>();
-        var renderer = weapon.GetComponent<SpriteRenderer>();
-        if (!collider || !renderer)
-        {
-            return;
-        }
-
-        var alphaVal = renderer.color.a;
+        var alphaVal = weaponRenderer.color.a;
         if (alphaVal >= 1.0f)
         {
             // Fire weapon since it's fully charged
@@ -69,37 +57,23 @@ public class UfoController : MonoBehaviour
         {
             var chargeAmount = 1.0f / chargeTime;
             var newAlpha = alphaVal + (chargeAmount * Time.deltaTime);
-            renderer.color = new(255, 0, 0, newAlpha);
+            weaponRenderer.color = new(255, 0, 0, newAlpha);
         }
     }
 
     private void FireWeapon()
     {
-        var collider = weapon.GetComponent<CircleCollider2D>();
-        var renderer = weapon.GetComponent<SpriteRenderer>();
-        if (!collider || !renderer)
-        {
-            return;
-        }
-
-        renderer.color = new(0, 0, 0);
-        collider.enabled = true;
+        weaponRenderer.color = new(0, 0, 0);
+        weaponCollider.enabled = true;
         weaponState = WeaponState.COOLDOWN;
     }
 
     private void WeaponCooldown()
     {
-        var collider = weapon.GetComponent<CircleCollider2D>();
-        var renderer = weapon.GetComponent<SpriteRenderer>();
-        if (!collider || !renderer)
-        {
-            return;
-        }
-
         // Disable hitbox while cooldown is in effect
-        collider.enabled = false;
+        weaponCollider.enabled = false;
 
-        var alphaVal = renderer.color.a;
+        var alphaVal = weaponRenderer.color.a;
         if (alphaVal <= 0f)
         {
             // Weapon has completely cooled down
@@ -109,36 +83,23 @@ public class UfoController : MonoBehaviour
         {
             var chargeAmount = 0.75f / cooldownTime;
             var newAlpha = alphaVal - (chargeAmount * Time.deltaTime);
-            renderer.color = new(0, 0, 0, newAlpha);
+            weaponRenderer.color = new(0, 0, 0, newAlpha);
         }
     }
 
     private void DisableWeapon()
     {
-        var collider = weapon.GetComponent<CircleCollider2D>();
-        var renderer = weapon.GetComponent<SpriteRenderer>();
-        if (!collider || !renderer)
-        {
-            return;
-        }
-
-        collider.enabled = false;
-        renderer.enabled = false;
+        weaponCollider.enabled = false;
+        weaponRenderer.enabled = false;
         weaponState = WeaponState.IDLE;
     }
 
     private void MoveToHerdCenter()
     {
-        HerdManager cows = targets.GetComponent<HerdManager>();
-        if (!cows)
-        {
-            return;
-        }
-
         Vector3 positionSum = Vector3.zero;
         int count = 0;
 
-        foreach (var cow in cows.herd)
+        foreach (var cow in targets.herd)
         {
             positionSum += cow.transform.position;
             count++;
@@ -167,10 +128,14 @@ public class UfoController : MonoBehaviour
         transform.Translate(displacement);
 
         Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, faceDirection);
-        targetRotation = Quaternion.RotateTowards(
-            transform.rotation,
-            targetRotation,
-            360 * Time.fixedDeltaTime);
+        if (GetComponent<SpriteRenderer>().isVisible)
+        {
+            // Apply smooth rotation when the ufo is on camera
+            targetRotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRotation,
+                360 * Time.fixedDeltaTime);
+        }
         transform.rotation = targetRotation;
     }
 }

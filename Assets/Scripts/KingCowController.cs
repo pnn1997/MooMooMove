@@ -9,6 +9,7 @@ public class KingCowController : CowController
     {
         IsAlive = true;
         Initialize();
+        checkForFriendlyCollision = false;
     }
 
     // Update is called once per frame

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CircleCollider2D))]
@@ -11,6 +9,8 @@ public abstract class CowController : MonoBehaviour
 
     public float MoveSpeed { get; private set; }
     public Vector3 MoveCommand { get; set; }
+
+    protected bool checkForFriendlyCollision = true;
 
     private float cowRadius;
     private Vector3 displacement;
@@ -78,6 +78,11 @@ public abstract class CowController : MonoBehaviour
     // This will adjust the displacement to prevent collisions with obstacles.
     protected void ProcessFriendlyCollisions()
     {
+        if (!checkForFriendlyCollision)
+        {
+            return;
+        }
+
         int layerMask = LayerMask.GetMask("NPC", "Player");
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position + displacement, cowRadius, layerMask);
 
