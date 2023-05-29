@@ -5,8 +5,13 @@ public class NpcSpawner : MonoBehaviour
     public GameObject cowmonnerPrefab;
     public uint numCowmonners = 3;
     public HerdManager cowmonners;
+    public GameObject ufoPrefab;
+    public InvasionManager invasion;
     public KingCowController kingCow;
 
+    public Vector3 ufoSpawnLocation = new(0, -50, 0);
+    public float ufoSpawnTime = 15.0f;                  // Seconds before the next UFO spawns
+    private float elapsedTime;
     private const uint MAX_COWS = 50;
 
     // Start is called before the first frame update
@@ -15,6 +20,37 @@ public class NpcSpawner : MonoBehaviour
         cowmonners.Initialize();
         numCowmonners = (uint) Mathf.Min(numCowmonners, MAX_COWS);
         SpawnCowCircles(kingCow.transform.position, numCowmonners);
+
+        invasion.Initialize();
+        SpawnUfo();
+    }
+
+    void Update()
+    {
+        // Scoring is added every second for each cow still alive in the herd
+        if (elapsedTime > ufoSpawnTime)
+        {
+            elapsedTime = 0;
+            if (invasion.CanAddUfo())
+            {
+                SpawnUfo();
+            }
+            else
+            {
+                invasion.IncreaseChargeSpeed();
+            }
+        }
+        else
+        {
+            elapsedTime += Time.deltaTime;
+        }
+    }
+
+    void SpawnUfo()
+    {
+        var ufo = Instantiate(ufoPrefab, ufoSpawnLocation, Quaternion.identity);
+        invasion.Add(ufo);
+        ufo.GetComponent<UfoController>().targets = cowmonners;
     }
 
     void SpawnCowCircle(Vector3 center, uint numCows, float circleRadius)

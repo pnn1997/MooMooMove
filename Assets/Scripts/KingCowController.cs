@@ -10,6 +10,7 @@ public class KingCowController : CowController
         IsAlive = true;
         Initialize();
         checkForFriendlyCollision = false;
+        CowController.remainingSpeedBoost = MAX_SPEED_BOOST_DURATION;
     }
 
     // Update is called once per frame
@@ -44,6 +45,50 @@ public class KingCowController : CowController
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
             movement += Vector3.up;
+        }
+
+        // Hold space for speed boost
+        if (Input.GetKey(KeyCode.Space) && CowController.remainingSpeedBoost > 0.0f)
+        {
+            CowController.isSpeedBoostEnabled = true;
+        }
+        // Disable speed boost when space key is no longer pressed
+        // Begin recharge cooldown time if the speed boost was just disabled
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            CowController.isSpeedBoostEnabled = false;
+            CowController.remainingCooldownTime = 0.0f;
+        }
+
+        // Process remaining speed boost amounts
+        if (CowController.isSpeedBoostEnabled)
+        {
+            CowController.remainingSpeedBoost -= Time.deltaTime;
+
+            if (CowController.remainingSpeedBoost <= 0)
+            {
+                CowController.remainingSpeedBoost = 0;
+                CowController.remainingCooldownTime = 0.0f;
+                CowController.isSpeedBoostEnabled = false;
+            }
+        }
+        else
+        {
+            if (CowController.remainingCooldownTime < SPEED_BOOST_COOLDOWN_DURATION)
+            {
+                CowController.remainingCooldownTime += Time.deltaTime;
+            }
+            else
+            {
+                if (CowController.remainingSpeedBoost > MAX_SPEED_BOOST_DURATION)
+                {
+                    CowController.remainingSpeedBoost = MAX_SPEED_BOOST_DURATION;
+                }
+                else if (CowController.remainingSpeedBoost < MAX_SPEED_BOOST_DURATION)
+                {
+                    CowController.remainingSpeedBoost += Time.deltaTime;
+                }
+            }
         }
 
         movement.Normalize();

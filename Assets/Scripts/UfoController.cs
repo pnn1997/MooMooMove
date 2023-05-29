@@ -9,6 +9,13 @@ public class UfoController : MonoBehaviour
     public float chargeTime = 2;
     public float cooldownTime = 0.5f;
 
+    private Vector3 direction;
+    private Vector3 displacement;
+    private float ufoRadius;
+
+    public float avoidOtherStrength = 1;                // How fast ufos will move away from each other
+    public float collisionAvoidCheckDistance = 30f;     // How close ufos are before trying to avoid collition
+
     private enum WeaponState
     {
         IDLE,
@@ -20,6 +27,7 @@ public class UfoController : MonoBehaviour
     void Start()
     {
         DisableWeapon();
+        ufoRadius = GetComponent<CircleCollider2D>().radius;
     }
 
     void Update()
@@ -27,7 +35,26 @@ public class UfoController : MonoBehaviour
         switch (weaponState)
         {
             case WeaponState.IDLE:
+                // Calculate the intended direction
                 MoveToHerdCenter();
+                AvoidOtherUfos();
+
+                // Perform translations/rotations
+                direction.z = 0;
+                direction.Normalize();
+                displacement = moveSpeed * Time.deltaTime * direction;
+
+                Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+                targetRotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRotation,
+                    360 * Time.fixedDeltaTime);
+                transform.rotation = targetRotation;
+
+                // Process forced displacements due to boundary collisions
+                ProcessFriendlyCollisions();
+
+                transform.Translate(displacement, Space.World);
                 break;
             case WeaponState.CHARGING:
                 ChargeWeapon();
@@ -123,19 +150,63 @@ public class UfoController : MonoBehaviour
         }
 
         faceDirection.Normalize();
+        direction = faceDirection;
+    }
 
-        Vector3 displacement = moveSpeed * Time.deltaTime * faceDirection;
-        transform.Translate(displacement);
+    protected void ProcessFriendlyCollisions()
+    {
+        int layerMask = LayerMask.GetMask("Enemies");
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position + displacement, ufoRadius, layerMask);
 
-        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, faceDirection);
-        if (GetComponent<SpriteRenderer>().isVisible)
+        CircleCollider2D circleCollider = GetComponent<CircleCollider2D>();
+
+        foreach (Collider2D hit in hits)
         {
-            // Apply smooth rotation when the ufo is on camera
-            targetRotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                360 * Time.fixedDeltaTime);
+            // Skip if we're checking against the current collider
+            if (hit == circleCollider)
+            {
+                continue;
+            }
+
+            ColliderDistance2D colliderDistance = hit.Distance(circleCollider);
+
+            if (colliderDistance.isOverlapped)
+            {
+                Vector2 adjustment = colliderDistance.pointA - colliderDistance.pointB;
+                adjustment.x += displacement.x;
+                adjustment.y += displacement.y;
+                displacement = new(adjustment.x, adjustment.y, 0);
+            }
         }
-        transform.rotation = targetRotation;
+    }
+
+    private void AvoidOtherUfos()
+    {
+        Vector3 faceAwayDirection = Vector3.zero;
+
+        InvasionManager ufos = transform.parent.GetComponent<InvasionManager>();
+        if (!ufos)
+        {
+            return;
+        }
+
+        // Check against other ufos
+        foreach (var ufo in ufos.invasion)
+        {
+            float distance = Vector2.Distance(ufo.transform.position, transform.position);
+
+            //if the distance is within range calculate away vector from it and subtract from away direction.
+            if (distance <= collisionAvoidCheckDistance)
+            {
+                faceAwayDirection += (transform.position - ufo.transform.position);
+            }
+        }
+
+        faceAwayDirection.z = 0;
+        faceAwayDirection = faceAwayDirection.normalized; //we need to normalize it so we are only getting direction
+
+        direction += avoidOtherStrength * faceAwayDirection;
+        direction /= (avoidOtherStrength + 1);
+        direction = direction.normalized;
     }
 }

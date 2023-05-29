@@ -56,7 +56,7 @@ public class WaterAnimator : MonoBehaviour
     }
     void RotateTexture2()
     {
-        angle2 += 45;
+        angle2 -= 45;
         waterSprite2.transform.rotation = Quaternion.AngleAxis(angle2, Vector3.forward);
     }
 
@@ -64,11 +64,12 @@ public class WaterAnimator : MonoBehaviour
     {
         float alphaVal = waterSprite.color.a;
 
-        if (alphaVal == 0)
+        if (alphaVal <= 0)
         {
             // First activation
             RotateTexture1();
             RotateTexture2();
+            alphaVal = 0.0f;
         }
 
         if (alphaVal >= alphaTarget)

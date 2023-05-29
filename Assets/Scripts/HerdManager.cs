@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HerdManager : MonoBehaviour
 {
-    public GameObject kingCow;
+    public GameObject kingCow;      // Used by cows in the herd for movement calculations
     public List<GameObject> herd;
     public bool IsHerdGone { get; private set; }
 
@@ -22,7 +22,7 @@ public class HerdManager : MonoBehaviour
         {
             herd.Add(cow);
             cow.transform.parent = this.transform;
-            cow.name = counter.ToString();
+            cow.name = "Cow " + counter.ToString();
             counter++;
         }
     }
@@ -37,5 +37,8 @@ public class HerdManager : MonoBehaviour
         }
     }
 
-
+    public int GetHerdSize()
+    {
+        return herd.Count;
+    }
 }

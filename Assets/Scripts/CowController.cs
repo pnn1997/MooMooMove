@@ -3,17 +3,29 @@ using UnityEngine;
 [RequireComponent(typeof(CircleCollider2D))]
 public abstract class CowController : MonoBehaviour
 {
+    #region Basic movement
     public float landMoveSpeed = 10;
     public float waterMoveSpeed = 2.5f;
     public float speedTransition = 3;
-
     public float MoveSpeed { get; private set; }
     public Vector3 MoveCommand { get; set; }
+    #endregion
 
+    #region Speedboost support
+    public SpriteRenderer speedBoostAura;
+    public static float remainingSpeedBoost;                     // Remaining speed boost in seconds
+    protected static bool isSpeedBoostEnabled = false;
+    protected static float remainingCooldownTime;
+    private const float SPEED_BOOST = 1.25f;
+    public const float MAX_SPEED_BOOST_DURATION = 3.0f;       // Max speed boost duration in seconds
+    protected const float SPEED_BOOST_COOLDOWN_DURATION = 1.0f;  // Time it takes before speed boost begins to recover
+    #endregion
+
+    #region Other member variables
     protected bool checkForFriendlyCollision = true;
-
     private float cowRadius;
     private Vector3 displacement;
+    #endregion
 
     // Initialization steps
     protected void Initialize()
@@ -27,7 +39,7 @@ public abstract class CowController : MonoBehaviour
 
     public void Move()
     {
-        // Calculate current speed based on terrain
+        // Calculate current speed based on terrain and if boost is active
         CalculateTerrainSpeed();
 
         // Reset displacement
@@ -43,7 +55,7 @@ public abstract class CowController : MonoBehaviour
 
         // Move the cow
         displacement.z = 0;
-        transform.Translate(displacement);
+        transform.Translate(displacement, Space.World);
     }
 
     public void SetMoveCommand(Vector3 newMoveCommand)
@@ -64,6 +76,14 @@ public abstract class CowController : MonoBehaviour
         bool isOnIsland = (hits.Length != 0);
         float targetSpeed = isOnIsland ? landMoveSpeed : waterMoveSpeed;
 
+        // Apply speed boost if active
+        if (CowController.isSpeedBoostEnabled)
+        {
+            targetSpeed *= SPEED_BOOST;
+        }
+        speedBoostAura.enabled = CowController.isSpeedBoostEnabled;
+
+        // Transition to the new speed
         if (Mathf.Abs(targetSpeed - MoveSpeed) > 0.1)
         {
             MoveSpeed += (targetSpeed - MoveSpeed) * Time.deltaTime * speedTransition;
