@@ -120,7 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   landMoveSpeed: 10
   waterMoveSpeed: 5
-  speedTransition: 3
+  speedTransition: 10
   direction: {x: 0, y: 0, z: 0}
   moveToKingStrength: 10
   moveToKingDistance: 3

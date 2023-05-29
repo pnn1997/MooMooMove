@@ -9,7 +9,6 @@ public abstract class CowController : MonoBehaviour
     public float waterMoveSpeed = 2.5f;
     public float speedTransition = 3;
 
-
     public float MoveSpeed { get; private set; }
     public Vector3 MoveCommand { get; set; }
 
