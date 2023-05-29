@@ -35,10 +35,6 @@ public class CowmonnerController : CowController
             MoveToKing();
 
             MoveCommand = direction * (MoveSpeed * Time.deltaTime);
-            if (MoveCommand.magnitude < 0.02)
-            {
-                MoveCommand = Vector3.zero;
-            }
             Move();
         }
     }
@@ -62,15 +58,11 @@ public class CowmonnerController : CowController
 
         if (tolerance > 0.1)
         {
-            Vector3 faceDirection;
+            Vector3 faceDirection = Vector3.zero;
 
             if (distance > moveToKingDistance)
             {
                 faceDirection = (cows.kingCow.transform.position - transform.position).normalized;
-            }
-            else
-            {
-                faceDirection = (transform.position - cows.kingCow.transform.position).normalized;
             }
 
             //move cow towards the king
@@ -93,6 +85,7 @@ public class CowmonnerController : CowController
             return;
         }
 
+        // Check against cowmonner cows
         foreach (var cow in cows.herd)
         {
             float distance = Vector2.Distance(cow.transform.position, transform.position);
@@ -102,13 +95,21 @@ public class CowmonnerController : CowController
                 count++;
             }
         }
-
+        // Check against king cow
+        float kingDistance = Vector2.Distance(cows.kingCow.transform.position, transform.position);
+        //if the distance is within range calculate away vector from it and subtract from away direction.
+        if (kingDistance <= localCowDistance)
+        {
+            positionSum += cows.kingCow.transform.position;
+            count++;
+        }
         if (count == 0)
         {
             return;
         }
 
-        //get average position of boids
+
+        //get average position of cows
         Vector3 positionAverage = positionSum / count;
         Vector3 faceDirection = (positionAverage - transform.position).normalized;
 
@@ -129,6 +130,7 @@ public class CowmonnerController : CowController
             return;
         }
 
+        // Check against other cows
         foreach (var cow in cows.herd)
         {
             float distance = Vector2.Distance(cow.transform.position, transform.position);
@@ -139,6 +141,15 @@ public class CowmonnerController : CowController
                 faceAwayDirection += (transform.position - cow.transform.position);
             }
         }
+
+        // Check against king cow
+        float kingDistance = Vector2.Distance(cows.kingCow.transform.position, transform.position);
+        //if the distance is within range calculate away vector from it and subtract from away direction.
+        if (kingDistance <= collisionAvoidCheckDistance)
+        {
+            faceAwayDirection += (transform.position - cows.kingCow.transform.position);
+        }
+
         faceAwayDirection.z = 0;
         faceAwayDirection = faceAwayDirection.normalized; //we need to normalize it so we are only getting direction
 

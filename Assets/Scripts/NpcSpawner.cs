@@ -8,7 +8,7 @@ public class NpcSpawner : MonoBehaviour
     public uint numCowmonners = 3;
     public HerdManager cowmonners;
 
-    private const uint MAX_COWS = 20;
+    private const uint MAX_COWS = 50;
 
     // Start is called before the first frame update
     void Start()
@@ -33,13 +33,16 @@ public class NpcSpawner : MonoBehaviour
     {
         const int MAX_COWS_CIRCLE_1 = 5;
         const int MAX_COWS_CIRCLE_2 = 15;
+        const int MAX_COWS_CIRCLE_3 = 30;
+
         uint circle1Cows;
         uint circle2Cows = 0;
+        uint circle3Cows = 0;
 
         if (numCows > MAX_COWS_CIRCLE_1)
         {
+            circle2Cows = numCows - MAX_COWS_CIRCLE_1;
             circle1Cows = MAX_COWS_CIRCLE_1;
-            circle2Cows = numCows - circle1Cows;
         }
         else
         {
@@ -48,12 +51,20 @@ public class NpcSpawner : MonoBehaviour
 
         if (circle2Cows > MAX_COWS_CIRCLE_2)
         {
+            circle3Cows = circle2Cows - MAX_COWS_CIRCLE_2;
             circle2Cows = MAX_COWS_CIRCLE_2;
+        }
+
+        if (circle3Cows > MAX_COWS_CIRCLE_3)
+        {
+            circle3Cows = MAX_COWS_CIRCLE_3;
         }
 
         // Spawn cow circle 1
         SpawnCowCircle(center, circle1Cows, 2);
         // Spawn cow circle 2
         SpawnCowCircle(center, circle2Cows, 4);
+        // Spawn cow circle 3
+        SpawnCowCircle(center, circle3Cows, 6);
     }
 }

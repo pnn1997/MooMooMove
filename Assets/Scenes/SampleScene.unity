@@ -791,7 +791,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cowmonnerPrefab: {fileID: 9117422035904257430, guid: 714aa229b6d43f64ca938d029f5c8ef3, type: 3}
-  numCowmonners: 25
+  numCowmonners: 50
   cowmonners: {fileID: 1273255368}
 --- !u!1 &951938527
 GameObject:

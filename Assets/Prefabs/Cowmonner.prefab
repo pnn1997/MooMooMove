@@ -123,10 +123,10 @@ MonoBehaviour:
   speedTransition: 3
   direction: {x: 0, y: 0, z: 0}
   moveToKingStrength: 10
-  moveToKingDistance: 2
-  moveToCenterStrength: 3
-  localCowDistance: 10
-  avoidOtherStrength: 2
-  collisionAvoidCheckDistance: 3
-  alignmentStrength: 1
-  alignmentCheckDistance: 2
+  moveToKingDistance: 3
+  moveToCenterStrength: 10
+  localCowDistance: 1
+  avoidOtherStrength: 10
+  collisionAvoidCheckDistance: 2
+  alignmentStrength: 4
+  alignmentCheckDistance: 0.5
