@@ -10,7 +10,7 @@ public class NpcSpawner : MonoBehaviour
     public KingCowController kingCow;
 
     public Vector3 ufoSpawnLocation = new(0, -50, 0);
-    public float ufoSpawnTime = 15.0f;                  // Seconds before the next UFO spawns
+    public float ufoSpawnTime = 5.0f;                  // Seconds before the next UFO spawns
     private float elapsedTime;
     private const uint MAX_COWS = 50;
 

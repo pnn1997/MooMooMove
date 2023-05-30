@@ -8,6 +8,8 @@ public class UfoController : MonoBehaviour
     public float moveSpeed = 12;
     public float chargeTime = 2;
     public float cooldownTime = 0.5f;
+    public bool isRetreat = false;
+    public bool isLeaderUfo = false;
 
     private Vector3 direction;
     private Vector3 displacement;
@@ -28,6 +30,7 @@ public class UfoController : MonoBehaviour
     {
         DisableWeapon();
         ufoRadius = GetComponent<CircleCollider2D>().radius;
+        isRetreat = false;
     }
 
     void Update()
@@ -151,10 +154,21 @@ public class UfoController : MonoBehaviour
 
         faceDirection.Normalize();
         direction = faceDirection;
+        
+        if (isRetreat)
+        {
+            direction *= -1;
+        }
     }
 
     protected void ProcessFriendlyCollisions()
     {
+        if (isRetreat || isLeaderUfo)
+        {
+            // Ignore for leader UFO or if UFOs should retreat
+            return;
+        }
+
         int layerMask = LayerMask.GetMask("Enemies");
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position + displacement, ufoRadius, layerMask);
 
@@ -182,6 +196,12 @@ public class UfoController : MonoBehaviour
 
     private void AvoidOtherUfos()
     {
+        if (isLeaderUfo)
+        {
+            // Ignore for leader UFO or if UFOs should retreat
+            return;
+        }
+
         Vector3 faceAwayDirection = Vector3.zero;
 
         InvasionManager ufos = transform.parent.GetComponent<InvasionManager>();
