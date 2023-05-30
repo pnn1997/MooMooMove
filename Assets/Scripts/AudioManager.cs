@@ -2,34 +2,25 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public AudioSource[] musicSources;
-    public int musicBPM, timeSignature, barsLength;
+    public AudioSource musicSource;
+    public ChordProgressionState chord;
 
-    private float loopPointMinutes, loopPointSeconds;
-    private double time;
-    private int nextSource;
+    public enum ChordProgressionState
+    {
+        C = 0,
+        Aflat = 1,
+        Eflat = 2,
+        Bflat = 3
+    }
+    private const int MAX_TIME_SAMPLES = 1209868;
 
     void Start()
     {
-        loopPointMinutes = (barsLength * timeSignature) / musicBPM;
-
-        loopPointSeconds = loopPointMinutes * 60;
-
-        time = AudioSettings.dspTime;
-
-        musicSources[0].Play();
-        nextSource = 1;
+        chord = ChordProgressionState.C;
     }
 
     void Update()
     {
-        if (!musicSources[nextSource].isPlaying)
-        {
-            time = time + loopPointSeconds;
-
-            musicSources[nextSource].PlayScheduled(time);
-
-            nextSource = 1 - nextSource; //Switch to other AudioSource
-        }
+        chord = (ChordProgressionState) ((4 * musicSource.timeSamples) / MAX_TIME_SAMPLES);
     }
 }

@@ -7,6 +7,7 @@ public class InvasionManager : MonoBehaviour
     public GameObject kingCow;          // Used by UFOs for movement calculations
     public List<GameObject> invasion;   // Collection of UFOs
     public GameStateManager gameStateManager;
+    public UfoWeaponAudioHandler audioHandler;
 
     private const int MAX_UFO_COUNT = 5;
     private static int counter = 0;
@@ -47,6 +48,7 @@ public class InvasionManager : MonoBehaviour
             {
                 ufo.GetComponent<UfoController>().isLeaderUfo = true;
             }
+            ufo.GetComponent<UfoController>().audioHandler = audioHandler;
             counter++;
         }
     }

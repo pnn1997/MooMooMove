@@ -3,6 +3,7 @@ using UnityEngine;
 public class UfoController : MonoBehaviour
 {
     public HerdManager targets;
+    public UfoWeaponAudioHandler audioHandler;
     public CircleCollider2D weaponCollider;
     public SpriteRenderer weaponRenderer;
     public float moveSpeed = 12;
@@ -96,6 +97,7 @@ public class UfoController : MonoBehaviour
         weaponRenderer.color = new(0, 0, 0);
         weaponCollider.enabled = true;
         weaponState = WeaponState.COOLDOWN;
+        audioHandler.PlayWeaponAudio();
     }
 
     private void WeaponCooldown()

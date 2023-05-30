@@ -5,6 +5,7 @@ using UnityEngine;
 public class HerdManager : MonoBehaviour
 {
     public GameObject kingCow;      // Used by cows in the herd for movement calculations
+    public CowAudioHandler audioHandler;
     public List<GameObject> herd;
     public bool IsHerdGone { get; private set; }
 
@@ -23,6 +24,7 @@ public class HerdManager : MonoBehaviour
             herd.Add(cow);
             cow.transform.parent = this.transform;
             cow.name = "Cow " + counter.ToString();
+            cow.GetComponent<CowmonnerController>().audioHandler = audioHandler;
             counter++;
         }
     }

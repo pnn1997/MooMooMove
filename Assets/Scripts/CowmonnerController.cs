@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class CowmonnerController : CowController
 {
+    public CowAudioHandler audioHandler;
     public Vector3 direction;
 
     public float moveToKingStrength = 1;                // How fast the cows will move to the king
@@ -44,6 +45,7 @@ public class CowmonnerController : CowController
 
     IEnumerator FadeAbductedCow(Color start, Color end, float duration)
     {
+        audioHandler.PlayCowAudio();
         for (float t = 0f; t < duration; t += Time.deltaTime)
         {
             float normalizedTime = t / duration;
